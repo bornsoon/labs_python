@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}오류발생{% endblock %}
+
+{% block content %}
+<h3>오류가 발생되었습니다.</h3>
+<div>{{ msg }}</div>
+
+{# 변수 선언은 보통 set이나 with 씀 #}
+{% with msgs = get_flashed_messages() %}
+    {% if msg %}
+        {% for msg in msgs %}
+            {{ msg }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

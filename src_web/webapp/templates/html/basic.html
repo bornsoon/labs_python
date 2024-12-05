@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask - Json</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
+</head>
+<body>
+    <form name="form" id="form" action="/json_echo" method="post">
+        <input name="name" value="홍길동">
+        <input name="age" value="15">
+        <button type="submit" id="btnSend">보내기</button>
+    </form>
+    <h1 id="msg"></h1>
+    <script>
+        $('#form').on('submit', function(e) {
+            e.preventDefault();
+            $.post('/json_echo', $('#form').serialize(), function() {
+            })
+            .then(function(data) {
+                console.log(data);
+                console.log(data.name, data.age)
+                $('#msg').text(data.name+'/'+data.age);
+            })
+        });
+    </script>
+</body>
+</html>

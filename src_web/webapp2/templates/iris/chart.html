@@ -1,0 +1,179 @@
+{% extends 'sbadmin2.html' %}
+
+{% block title %}Dataset - Chart{% endblock %}
+
+{% block page_title %}Chart{% endblock %}
+
+{% block content %}
+<!-- https://www.chartjs.org 참조 -->
+<div class='row'>
+    <div class='col-xl-8 col-lg-7'> <!-- Grid options : 해상도별 layout -->
+        
+        <!-- Area Chart -->
+        <div class='card shadow mb-4'>
+            <div class='card-header py-3'>
+                <h6 class='m-0 font-weight-bold text-primary'>Line Chart</h6>
+            </div>
+            <div class='card-body'>
+                <div class='chart-area'>
+                    <canvas id='myLineChart'></canvas>
+                </div>
+                <hr>
+                연도별 매출현황 chart.js
+            </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class='card shadow mb-4'>
+            <div class='card-header py-3'>
+                <h6 class='m-0 font-weight-bold text-primary'>Bar Chart</h6>
+            </div>
+            <div class='card-body'>
+                <div class='chart-bar'>
+                    <canvas id='myBarChart'></canvas>
+                </div>
+                <hr>
+                연도별 매출현황 chart.js
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Pie Chart -->
+    <div class='col-xl-4 col-lg-5'>
+        <div class='card shadow mb-4'>
+            <!-- Card Header - Dropdown -->
+            <div class='card-header py-3'>
+                <h6 class='m-0 font-weight-bold text-primary'>Pie Chart</h6>
+            </div>
+            <!-- Card Body -->
+            <div class='card-body'>
+                <div class='chart-pie pt-4'>
+                    <img src='/iris/chart/pie.png' style='width:100%;'>
+                </div>   <!-- 정적인 이미지가 아니기때문에 static 폴더 X -->
+                <hr>
+                Iris 품종별 파이 차트
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function getJson(objForm) {
+        var arry = objForm.serializeArray();
+        var obj = {};
+
+        arry.forEach(function(item){
+            if (item['name'] != undefined)
+            obj[item['name']] = item['value'];
+        });
+
+        return obj;
+    }
+
+    function drawBarChart(_el, _label, _data) {
+        var ctx = document.getElementById(_el);
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: _label,
+                datasets: [{
+                    data: _data,
+                    backgroundColor: '#4e73df',
+                    hoverBackgroundColor: '#2e59d9',
+                    borderColor: '#4e73df',
+                    label: '매출액',
+                }],
+            },
+            options: {
+                title: {
+                    display:true,
+                    text: '연도별 매출현황'
+                },
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            color: 'rgb(234, 236, 244)',
+                            borderDash: [2],
+                        }
+                    }],
+                },
+                tooltips: {
+                    titleFontColor: '#6e707e',
+                    backgroundColor: 'rgb(255,255,255)',
+                    bodyFontColor: '#858796',
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': $' + tooltipItem.yLabel;
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // drawBarChart('myBarChart', ['1월', '2월', '3월', '4월', '5월', '6월'], [4321, 5432, 4568, 6573, 2345, 7532])
+
+    function drawLineChart(_el, _label, _data) {
+        var ctx = document.getElementById(_el);
+        var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: _label,
+                datasets: [{
+                    data: _data,
+                    lineTension: 0.0, // 직선
+                    borderColor: '#4e73df',
+                    backgroundColor: "rgba(78, 115, 223, 0.05)", // 하단색상
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    text: '연도별 매출현황'
+                }],
+            },
+            options: {
+                title: {
+                    display:true,
+                    text: '연도별 매출현황'
+                },
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    titleFontColor: '#6e707e',
+                    backgroundColor: 'rgb(255,255,255)',
+                    bodyFontColor: '#858796',
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': $' + tooltipItem.yLabel;
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // drawLineChart('myLineChart', ['1월', '2월', '3월', '4월', '5월', '6월'], [4321, 5432, 4568, 6573, 2345, 7532]);
+    $.post('/iris/chart/datas', {}, function() {
+        // 모래시계
+    }).done(function(data){
+        drawBarChart('myBarChart', data.labels, data.datas)
+        drawLineChart('myLineChart', data.labels, data.datas)
+    })
+</script>
+{% endblock %}
